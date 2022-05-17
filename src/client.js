@@ -1,6 +1,9 @@
 const { MongoClient } = require('mongodb');
 const url = "mongodb://localhost:27017";
 
+// <protocol>://<username:password>@<domain>:<port>
+//"mongodb://admin:password@localhost:27017";
+
 module.exports = {
   async run() {
     const client = await MongoClient.connect(url, { useNewUrlParser: true })
