@@ -3,7 +3,7 @@ const clientModule = require('./client')
 ;(async() => {
   const client = await clientModule.run()
 
-  const collection = client.db('test').collection('new_collection');
+  const collection = client.db('mytest').collection('users');
   const users = await collection.find({}).toArray()
 
   console.log(users)
@@ -37,3 +37,35 @@ db.getCollection("new_collection").find({
   ] 
 }).toArray()
 */
+
+
+// const users = await collection.aggregate([
+//   {
+//     $lookup: {
+//       from: "companies",
+//       localField: "company",
+//       foreignField: "name",
+//       as: "company",
+//     }
+//   },
+//   {
+//     $unwind: '$company'
+//   }
+// ]).toArray()
+
+// const users = await collection.aggregate([
+//   { "$lookup": {
+//     "from": "companies",
+//     "let": { "company": "$company" },
+//     "pipeline": [
+//       { "$match": {
+//         "$expr": { "$eq": [ "$name", "$$company" ] }
+//       }},
+//       { '$project': { _id: 0, name: 1 } }
+//     ],
+//     "as": "company"
+//   }},
+//   {
+//     $unwind: '$company'
+//   }
+// ]).toArray()

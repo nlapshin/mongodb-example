@@ -21,6 +21,8 @@ module.exports = class UserModel {
       return res
     }, {})
 
+    mem.show()
+
     return count
   }
 

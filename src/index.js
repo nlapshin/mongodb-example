@@ -14,7 +14,7 @@ async function run() {
   const userModel = new UserModel(client)
 
   app.get('/gateway', async (req, res) => {
-    const result = await userModel.getLanguageAggregation()
+    const result = await userModel.getLanguagesCount()
 
     return res.json(result)
   })

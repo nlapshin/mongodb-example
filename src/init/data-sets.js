@@ -1,23 +1,40 @@
 const { faker } = require('@faker-js/faker');
 
+const COMPANIES = [ 'Yandex', 'Mail', 'Rambler' ];
+const LANGUAGES = [ 'Javascript', 'Typescript', 'Go', 'Rust', 'Python', 'C', 'C++', 'C#', 'Haskell' ]
+
 module.exports = {
-  generate(max = 100) {
-    const data = []
+  getCompanies() {
+    const companies = [];
+
+    for (let i = 0; i < COMPANIES.length; i++) {
+      companies.push({
+        name: COMPANIES[i],
+        employees: faker.datatype.number(10000, 100000),
+      })
+    }
+
+    return companies
+  },
+
+  generateUsers(max = 100) {
+    const users = []
 
     for (let i = 0; i < max; i++) {
-      data.push({
+      users.push({
         name: faker.name.findName(),
         email: faker.internet.email(),
         phone: faker.phone.phoneNumber(),
         age: faker.datatype.number(100),
+        company: this.generateCompany(),
         skills: {
           english: this.generateEnglish(),
           languages: this.generateLanguages()
-        }
+        },
       })
     }
 
-    return data
+    return users
   },
 
   generateEnglish() {
@@ -41,15 +58,16 @@ module.exports = {
   },
 
   generateLanguage() {
-    const languages = [ 'Javascript', 'Typescript', 'Go', 'Rust', 'Python', 'C', 'C++', 'C#', 'Haskell' ]
-    
-    return this.generateFromArray(languages)
+    return this.generateFromArray(LANGUAGES)
+  },
+
+  generateCompany() {
+    return this.generateFromArray(COMPANIES)
   },
 
   generateFromArray(arr) {
     const index = faker.datatype.number(arr.length - 1)
 
     return arr[index]
-
   }
 }
