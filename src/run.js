@@ -6,34 +6,82 @@ const clientModule = require('./client')
   const collection = client.db('test').collection('new_collection');
   const users = await collection.find({}).toArray()
 
-  console.log(users)
+  // console.log(users)
 
   await client.close()
 })()
 
-// CRUD
+/* 
+3 поля. Каждое объязательное.
+Поле name - тип string
+Поле age - типа integer. 0 - 150.
+Поле country - тип string. Допустимые значения RU, US
 
-// Create -> insert -> insertOne, insertMany
-// db.getCollection('collection').insert()
 
-// Read -> find -> find, findOne
-// db.getCollection('collection').find()
+const user = {
+  name: 'Nik',
+  age: 32,
+  country: 'RU'
+}
 
-// Update -> update -> updateOne, updateMany
-// db.getCollection('collection').update()
-// Мы обновляем что-то где-то
+// Императивный стиль
+function validateUser(user) {
+  if('name' in user === false) {
+    return { error: 'Name is not set' }
+  }
+  
+  if('age' in user === false) {
+    return { error: 'Name is not set' }
+  }
+  
+  if('country' in user === false) {
+    return { error: 'Name is not set' }
+  }
 
-// Delete -> delete -> deleteOne, deleteMany
-// db.getCollection('collection').delete()
+  if (typeof user.name === 'string') {
+    return 
+  }
 
-// $gt - селектор greater than
-// $lt - селектор less than
+  if (typeof user.age === 'number' && !Number.isNaN(user.age)) {
 
-/*
-db.getCollection("new_collection").find({ 
-  $and: [
-    { age: { $lt: 26 } },
-    { name: "lena" }
-  ] 
-}).toArray()
+  }
+
+  if (typeof user.country === 'string' && ['RU', 'US'].includes(user.country)) {
+    return 
+  }
+
+  return Object.keys(user).length === 3
+}
+
+// Декларативном стиле
+
+const userSchema = {
+  "$id": "user",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "The person's first name."
+    },
+    "age": {
+      "description": "Age in years which must be equal to or greater than zero.",
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 150
+    },
+    "country": {
+      "type": "string",
+      "description": "The person's first name.",
+      "enums": [
+        "US",
+        "RU"
+      ]
+    }
+  }
+}
+
+const Ajv = require("ajv")
+const ajv = new Ajv()
+
+const valid = ajv.validate(userSchema, user)
 */

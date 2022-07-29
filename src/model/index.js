@@ -25,7 +25,7 @@ module.exports = class UserModel {
   }
 
   async getLanguagesCountForEach() {
-    const users = await this.collection.find({})
+    const users = await this.collection.find({}) // cursor
     const count = {}
 
     await users.forEach(user => {
@@ -41,7 +41,7 @@ module.exports = class UserModel {
     return count
   }
 
-  async getLanguageMapReduce() {
+  async getLanguageCountMapReduce() {
     const count = await this.collection.mapReduce(
       function () {
           emit(1, this.skills.languages)
@@ -67,7 +67,7 @@ module.exports = class UserModel {
     return count[0].value
   }
 
-  async getLanguageAggregation() {
+  async getLanguageCountAggregation() {
     const res = await this.collection.aggregate([
       {
         $project: { 
