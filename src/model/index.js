@@ -1,5 +1,14 @@
 const mem = require('../mem')
 
+// autocanon - десять соединений, который делают запросы
+// к серверу параллельно.
+// 1 Способ. Время выполнения: 550 ms/4500 ms. Выделяется много памяти.
+// 2 Способ. Время выполнения: 500 ms/4000 ms. Память в норме.
+// 3 Способ. Время выполнения: 650 ms/1900 ms. Память в идеальном виде.
+// 4 Способ. Время выполнения: 120 ms/300 ms. Память в идеальном виде.
+
+// 1 Прием - это поиск. 2 Прием - это аггрегация данных.
+
 module.exports = class UserModel {
   constructor(client) {
     this.client = client
@@ -8,6 +17,12 @@ module.exports = class UserModel {
 
   async getLanguagesCount() {
     const users = await this.collection.find({}).toArray()
+    // массив из 60000 записей
+    // Проблема может долго работать.
+    // Проблемы с память.
+
+    // const cursor = this.collection.find({})
+    // cursor.toArray()
 
     const count = users.reduce((res, user) => {
       user.skills.languages.forEach(lang => {
@@ -20,8 +35,6 @@ module.exports = class UserModel {
 
       return res
     }, {})
-
-    mem.show()
 
     return count
   }
@@ -43,11 +56,14 @@ module.exports = class UserModel {
     return count
   }
 
+  // Первый два случая. Ищем в монге. Аггрерируем на сервере.
+  // 
+
   async getLanguageMapReduce() {
     const count = await this.collection.mapReduce(
       function () {
           emit(1, this.skills.languages)
-      },
+      }, // сбор данных
       function (key, values) {
           var result = {};
 
@@ -62,7 +78,7 @@ module.exports = class UserModel {
           })
 
           return result;
-      },
+      }, // аггегирует
       { out: { inline: 1 } }
     );
 
@@ -72,17 +88,17 @@ module.exports = class UserModel {
   async getLanguageAggregation() {
     const res = await this.collection.aggregate([
       {
-        $project: { 
-          'skills.languages' : 1 
+        $project: {
+          'skills.languages' : 1 // 1 true, 0 false
         }
-      },
+      }, // убираем все лишнее. skills.languages
       {
         $unwind: "$skills.languages"
-      },
+      }, // разоворачиваем массив.
       {
         $group: {
-          _id: "$skills.languages",
-          count: { $sum: 1 }
+          _id: "$skills.languages", // $skills.languages.
+          count: { $sum: 1 } // поле count, которая будет с суммой по языкам $sum
         }
       },
     ]).toArray()
@@ -92,6 +108,8 @@ module.exports = class UserModel {
 
       return res
     }, {})
+
+    mem.show()
 
     return count
   }
