@@ -1,8 +1,8 @@
 const express = require('express')
 const bodyParser = require('body-parser')
+const { ObjectId } = require('mongodb');
 
 const mongoClient = require('./client')
-const UserModel = require('./model')
 
 run()
 
@@ -11,10 +11,34 @@ async function run() {
   app.use(bodyParser.json())
 
   const client = await mongoClient.run()
-  const userModel = new UserModel(client)
+  const usersCollection = client.db('mytest').collection('users');
 
-  app.get('/gateway', async (req, res) => {
-    const result = await userModel.getLanguagesCount()
+  app.get('/users', async (req, res) => {
+    const result = await usersCollection.find().toArray()
+
+    return res.json(result)
+  })
+
+  app.get('/users/:id', async (req, res) => {
+    const result = await usersCollection.findOne({ _id: new ObjectId(req.params.id) })
+
+    return res.json(result)
+  })
+
+  app.post('/users', async (req, res) => {
+    const result = await usersCollection.insertOne(req.body)
+
+    return res.json(result)
+  })
+
+  app.patch('/users/:id', async (req, res) => {
+    const result = await usersCollection.updateOne({ _id: new ObjectId(req.params.id) }, { $set: req.body })
+
+    return res.json(result)
+  })
+
+  app.delete('/users/:id', async (req, res) => {
+    const result = await usersCollection.deleteOne({ _id: new ObjectId(req.params.id) })
 
     return res.json(result)
   })
