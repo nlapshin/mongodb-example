@@ -11,6 +11,7 @@ async function run() {
   app.use(bodyParser.json())
 
   const client = await mongoClient.run()
+
   const usersCollection = client.db('mytest').collection('users');
 
   app.get('/users', async (req, res) => {
@@ -32,7 +33,12 @@ async function run() {
   })
 
   app.patch('/users/:id', async (req, res) => {
-    const result = await usersCollection.updateOne({ _id: new ObjectId(req.params.id) }, { $set: req.body })
+    // _id - это ObjectId
+    const result = await usersCollection.updateOne(
+      { _id: new ObjectId(req.params.id) }, 
+      { $set: req.body },
+      { upsert: true }
+    )
 
     return res.json(result)
   })
