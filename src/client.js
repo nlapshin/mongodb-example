@@ -1,5 +1,5 @@
 const { MongoClient } = require('mongodb');
-const url = "mongodb://localhost:27017";
+const url = "mongodb://admin:admin@localhost:27019";
 
 module.exports = {
   async run() {

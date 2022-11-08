@@ -4,10 +4,10 @@ const bodyParser = require('body-parser')
 const mongoClient = require('./client')
 const UserModel = require('./model')
 
-// 1 способ: 300ms. 2500ms
-// 2 способ: 294ms. 2100ms
-// 3 способ: 350ms. 1200ms
-// 4 способ: 80ms. 180ms
+// 1 способ. 800 ms / 5000 / memory issues
+// 2 способ. 750 ms / 4800 ms / memory 90 MB 
+// 3 способ. 750 ms / 2300 ms
+// 4 способ. 140 ms / 350 ms
 
 run()
 

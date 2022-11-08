@@ -12,7 +12,9 @@ const dataSets = require('./data-sets')
   await client.close()
 })()
 
+// mongodb://[username:password@]host1[:port1][,...hostN[:portN]][/[defaultauthdb][?options]]
 
+/*
 # mongod.conf
 
 # for documentation of all options, see:
@@ -56,3 +58,4 @@ processManagement:
 #auditLog:
 
 #snmp:
+*/

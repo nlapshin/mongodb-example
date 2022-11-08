@@ -6,6 +6,11 @@ module.exports = class UserModel {
     this.collection = client.db('mytest').collection('users');
   }
 
+  // сервер - база данных.
+  // поиск в базе. 1
+  // выгрузка всех данных на сервер. 2
+  // подсчет на сервере. 3
+
   async getLanguagesCount() {
     const users = await this.collection.find({}).toArray()
 
@@ -21,14 +26,22 @@ module.exports = class UserModel {
       return res
     }, {})
 
+    mem.show()
+
     return count
   }
 
+
+  // сервер - база данных.
+  // поиск в базе. 1
+  // выгрузка всех данных на сервер чанками. 2
+  // подсчет на сервере. 3
+
   async getLanguagesCountForEach() {
-    const users = await this.collection.find({}) // cursor
+    const cursor = await this.collection.find({}) // cursor
     const count = {}
 
-    await users.forEach(user => {
+    await cursor.forEach(user => {
       user.skills.languages.forEach(lang => {
         if (!count[lang]) {
           count[lang] = 0
@@ -38,18 +51,42 @@ module.exports = class UserModel {
       })
     })
 
+    mem.show()
+
     return count
   }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  // collection.mapReduce(mapFunction, reduceFunction, out)
 
   async getLanguageCountMapReduce() {
     const count = await this.collection.mapReduce(
       function () {
-          emit(1, this.skills.languages)
+          emit(1, this.skills.languages) // index, data
       },
       function (key, values) {
           var result = {};
 
           values.forEach(list => {
+            if (!list.forEach) {
+              return
+            }
+
             list.forEach(lang => {
               if (!result[lang]) {
                 result[lang] = 0
@@ -67,20 +104,26 @@ module.exports = class UserModel {
     return count[0].value
   }
 
+
+
+  // Aggegation framework все вычисление на  строну бд
+
+
   async getLanguageCountAggregation() {
     const res = await this.collection.aggregate([
       {
         $project: { 
-          'skills.languages' : 1 
+          _id: 0, // 0 - это убрать поле, 1 оставить
+          'langs' : '$skills.languages' 
         }
-      },
+      }, // Выбрать только skills.languages.
       {
-        $unwind: "$skills.languages"
-      },
+        $unwind: "$langs"
+      }, // Сделать массив записей плоским
       {
         $group: {
-          _id: "$skills.languages",
-          count: { $sum: 1 }
+          _id: "$langs", // значение группировки
+          count: { $sum: 1 },
         }
       },
     ]).toArray()
