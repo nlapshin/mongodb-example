@@ -3,6 +3,31 @@ const { faker } = require('@faker-js/faker');
 const COMPANIES = [ 'Yandex', 'Mail', 'Rambler' ];
 const LANGUAGES = [ 'Javascript', 'Typescript', 'Go', 'Rust', 'Python', 'C', 'C++', 'C#', 'Haskell' ]
 
+// база mytest
+// 1 коллекция users. Пользователи
+/*
+{
+	"_id" : ObjectId("636a87a2e55391e26ac69157"),
+	"name" : "Lisa Bradtke",
+	"email" : "Carmella.Auer@yahoo.com",
+	"phone" : "412-469-8257",
+	"age" : 71,
+	"company" : "Mail",
+	"skills" : {
+		"english" : "B1",
+		"languages" : [
+			"Python",
+			"C#"
+		]
+	}
+}
+Задача. Сделай аггрегарцию какие языки знают наши пользователи
+{
+  Javascript: 1000,
+  Typescript: 500,
+}
+*/
+
 module.exports = {
   getCompanies() {
     const companies = [];

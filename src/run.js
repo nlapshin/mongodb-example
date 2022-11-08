@@ -1,24 +1,225 @@
 const clientModule = require('./client')
 
+// 1. Авторизация
+// 2. Репликация
+// 3. Шардирование. А - К положили на один сервер,K до Я на другой.
+
+
+// db.runCommand(
+//   {
+//     explain: { count: "users", query: { company: 'Mail' } },
+//     verbosity: "queryPlanner"
+//   }
+// )
+
+/*
+{
+    "namespace" : "mytest.users",
+    "indexFilterSet" : false,
+    "parsedQuery" : {
+        "company" : {
+            "$eq" : "Mail"
+        }
+    },
+    "queryHash" : "CC263DCB",
+    "planCacheKey" : "CC263DCB",
+    "maxIndexedOrSolutionsReached" : false,
+    "maxIndexedAndSolutionsReached" : false,
+    "maxScansToExplodeReached" : false,
+    "winningPlan" : {
+        "stage" : "COUNT",
+        "inputStage" : {
+            "stage" : "COLLSCAN",
+            "filter" : {
+                "company" : {
+                    "$eq" : "Mail"
+                }
+            },
+            "direction" : "forward"
+        }
+    },
+    "rejectedPlans" : []
+}
+*/
+
+// db.members.createIndex( { groupNumber: 1, lastname: 1, firstname: 1 }, { unique: true } )
+
+;(async() => {
+  const client = await clientModule.run()
+  const collection = client.db('mytest').collection('users');
+
+  const res = await client.db('mytest').runCommand(
+    {
+      explain: { count: "users", query: { company: 'Mail' } },
+      verbosity: "queryPlanner"
+    }
+  )
+
+  // const users = await collection.aggregate([
+  //   { 
+  //     "$lookup": {
+  //       "from": "companies", // откуда
+  //       "localField": "company", // поле сравнения
+  //       "foreignField": "name",
+  //       "as": "company" // как назвать новое поле
+  //     }
+  //   },
+  //   {
+  //     $unwind: '$company'
+  //   }
+  // ]).toArray()
+
+  // console.log(users[0])
+
+  /*
+  {
+    _id: new ObjectId("636a87a2e55391e26ac69157"),
+    name: 'Lisa Bradtke',
+    email: 'Carmella.Auer@yahoo.com',
+    phone: '412-469-8257',
+    age: 71,
+    company: {
+      _id: new ObjectId("636a87a2e55391e26ac6b868"),
+      name: 'Mail',
+      employees: 9707
+    },
+    skills: { english: 'B1', languages: [ 'Python', 'C#' ] }
+  }
+  */
+
+  // const users = await collection.aggregate([
+  //     { 
+  //       "$group": {
+  //         "_id": "$company",
+  //         // "names": { $push: '$name' }, // добавляет в массив
+  //         "ages": { $addToSet: '$age' }, // добавляет в массив только уникальные
+  //         "ageAverage": { $avg: '$age' }
+  //       }
+  //     }
+  //   ]).toArray()
+
+  // console.log(users[0])
 
 
 
 
 
+  
+
+})()
+
+// Познакомились с MongoDB
+// Чем отличается MongoDB от Postgres:
+// - документоориентированная.
+// - schemaless. Отсуствие схем.
+// - имперический подход.
+
+// Декларативный. Что? Что мы хотим сделать.
+/* Ищет все записи из таблицы cities, где город Moscow 
+SELECT * FROM cities WHERE city = Moscow
+*/
+
+// Имперический. Как? Что мы хотим сделать.
+/* Ищет все записи из таблицы cities, где город Moscow 
+db.collection('cities').find({ city: 'Moscow' })
+*/
+
+// Схема в MongoDB.
+// 
+
+/*
+const userSchema = {
+  "type": "object",
+  "required": [ "user", "age" ],
+  "properties": {
+    "user": {
+      "type": "string",
+      "maxLength": 128
+    },
+    "age": {
+      "type": "number",
+      "min": 0,
+      "max": 150
+    },
+    "skills": {
+      "type": "number",
+      "min": 0,
+      "max": 150
+    }
+  }
+}
+
+const user = {
+  name: 'Nik', // String, Required
+  age: 32, // Number, Required
+  skills: ['Javascript', 'Golang'] // Array[String], Optionals
+}
+
+const wrongUser = {
+  age: '32',
+  skills: 'Javascript, Golang'
+}
+
+// Не чистый JSON. BSON.
+// ObjectId
+
+// db.createCollection("students", {
+// 	validator: {
+// 		$jsonSchema: {...}
+// 	}
+// }
+
+// jsonSchema
+*/
+
+// ORM - Object-Relational Mapping
+// ODM - Object-Document Mapping. Для MongoDB - это Mongoose.
+
+// Схема
+// 1. Нативный - через jsonSchema
+// 2. Используя ODM - обертки.
 
 
+// age: 32, age: '32'
 
+// Веб-форма(не преобразовала из string в int) -> backend(в API нет схемы) -> DB(нет схемы)
 
+// Проблематика
+// db.collection('cities').find({ city: { $regexp: 'Moscow' } })
+// Задача список городов(1000+) и стран(50+) и жителей в каждом городе.
+// Нужно получить сколько живет в каждой стране жителей.
 
+/*
+{
+  city: "Moscow",
+  country: 'Russia',
+  population: 10000000
+}
+*/
 
+/*
+const cities = db.collection('cities').find({}).toArray()
+const groupCities = {}
 
+for (const city)
+*/
+// Filter - поиск
+// Group - не можем(GROUP BY)
+// sort, limit, skip - можем
 
+// aggregation framework
+// pipeline
 
-
-
-
-
-
+/*
+const groupCities = db.collection.aggregate([
+  {
+    $group: {
+      _id: '$country',
+      sumPopulation: { $sum: '$population' }
+    }
+  }
+])
+*/
 
 
 
